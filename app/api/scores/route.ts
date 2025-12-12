@@ -3,13 +3,13 @@ import { saveScore, getLeaderboard } from "@/lib/db/client"
 
 export async function POST(request: Request) {
   try {
-    const { playerName, score, timeRemaining, total } = await request.json()
+    const { playerName, score, timeRemaining, total, difficulty } = await request.json()
 
     if (!playerName || typeof score !== "number" || typeof timeRemaining !== "number" || typeof total !== "number") {
       return NextResponse.json({ error: "Invalid request data" }, { status: 400 })
     }
 
-    const result = await saveScore(playerName, score, timeRemaining, total)
+    const result = await saveScore(playerName, score, timeRemaining, total, difficulty || "average")
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 })

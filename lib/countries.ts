@@ -8,6 +8,7 @@ const ALL_COUNTRIES = [
   "Antigua and Barbuda",
   "Argentina",
   "Armenia",
+  "Aruba",
   "Australia",
   "Austria",
   "Azerbaijan",
@@ -18,6 +19,7 @@ const ALL_COUNTRIES = [
   "Belarus",
   "Belgium",
   "Belize",
+  "Bermuda",
   "Benin",
   "Bhutan",
   "Bolivia",
@@ -29,6 +31,7 @@ const ALL_COUNTRIES = [
   "Burkina Faso",
   "Burundi",
   "Cabo Verde",
+  "Cayman Islands",
   "Cambodia",
   "Cameroon",
   "Canada",
@@ -39,6 +42,7 @@ const ALL_COUNTRIES = [
   "Colombia",
   "Comoros",
   "Congo",
+  "Cook Islands",
   "Costa Rica",
   "Croatia",
   "Cuba",
@@ -59,6 +63,7 @@ const ALL_COUNTRIES = [
   "Estonia",
   "Eswatini",
   "Ethiopia",
+  "Falkland Islands",
   "Fiji",
   "Finland",
   "France",
@@ -69,9 +74,10 @@ const ALL_COUNTRIES = [
   "Ghana",
   "Greece",
   "Grenada",
+  "Guadeloupe",
   "Guatemala",
   "Guinea",
-  "Guinea-Bissau",
+  "Guinea Bissau",
   "Guyana",
   "Haiti",
   "Honduras",
@@ -142,6 +148,7 @@ const ALL_COUNTRIES = [
   "Philippines",
   "Poland",
   "Portugal",
+  "Puerto Rico",
   "Qatar",
   "Romania",
   "Russia",
@@ -176,7 +183,7 @@ const ALL_COUNTRIES = [
   "Tajikistan",
   "Tanzania",
   "Thailand",
-  "Timor-Leste",
+  "Timor Leste",
   "Togo",
   "Tonga",
   "Trinidad and Tobago",
@@ -195,18 +202,43 @@ const ALL_COUNTRIES = [
   "Vatican City",
   "Venezuela",
   "Vietnam",
+  "Western Sahara",
   "Yemen",
   "Zambia",
   "Zimbabwe",
-]
+];
 
 // Common alternative names for matching
 export const COUNTRY_ALIASES: Record<string, string[]> = {
-  "United States": ["USA", "US", "United States of America", "America", "U.S.A", "U.S", "States"],
+  "United States": [
+    "USA",
+    "US",
+    "United States of America",
+    "America",
+    "U.S.A",
+    "U.S",
+    "States",
+  ],
   "United Kingdom": ["UK", "Britain", "Great Britain", "England", "U.K", "GB"],
-  "Democratic Republic of the Congo": ["DRC", "DR Congo", "Congo-Kinshasa", "Congo Kinshasa", "Zaire"],
-  Congo: ["Republic of Congo", "Congo-Brazzaville", "Congo Brazzaville", "Republic of the Congo"],
-  "Ivory Coast": ["Cote d'Ivoire", "Cote d Ivoire", "Cote dIvoire", "Côte d'Ivoire"],
+  "Democratic Republic of the Congo": [
+    "DRC",
+    "DR Congo",
+    "Congo-Kinshasa",
+    "Congo Kinshasa",
+    "Zaire",
+  ],
+  Congo: [
+    "Republic of Congo",
+    "Congo-Brazzaville",
+    "Congo Brazzaville",
+    "Republic of the Congo",
+  ],
+  "Ivory Coast": [
+    "Cote d'Ivoire",
+    "Cote d Ivoire",
+    "Cote dIvoire",
+    "Côte d'Ivoire",
+  ],
   "North Korea": ["DPRK", "Democratic People's Republic of Korea", "NK"],
   "South Korea": ["Korea", "Republic of Korea", "ROK", "SK", "S Korea"],
   "Czech Republic": ["Czechia"],
@@ -232,22 +264,22 @@ export const COUNTRY_ALIASES: Record<string, string[]> = {
   Tanzania: ["TZ"],
   "Central African Republic": ["CAR"],
   "Dominican Republic": ["DR"],
-}
+};
 
 export function normalizeCountryName(input: string): string {
   return input
     .toLowerCase()
     .trim()
-    .replace(/[^a-z\s]/g, "")
+    .replace(/[^a-z\s]/g, "");
 }
 
 export function findCountryMatch(input: string): string | null {
-  const normalized = normalizeCountryName(input)
+  const normalized = normalizeCountryName(input);
 
   // Direct match
   for (const country of ALL_COUNTRIES) {
     if (normalizeCountryName(country) === normalized) {
-      return country
+      return country;
     }
   }
 
@@ -255,18 +287,24 @@ export function findCountryMatch(input: string): string | null {
   for (const [country, aliases] of Object.entries(COUNTRY_ALIASES)) {
     for (const alias of aliases) {
       if (normalizeCountryName(alias) === normalized) {
-        return country
+        return country;
       }
     }
   }
 
-  return null
+  return null;
 }
 
 export interface CountryData {
-  name: string
-  continent: "Africa" | "Asia" | "Europe" | "North America" | "South America" | "Oceania"
-  iso: string
+  name: string;
+  continent:
+    | "Africa"
+    | "Asia"
+    | "Europe"
+    | "North America"
+    | "South America"
+    | "Oceania";
+  iso: string;
 }
 
 export const COUNTRY_DATA: CountryData[] = [
@@ -419,7 +457,11 @@ export const COUNTRY_DATA: CountryData[] = [
   { name: "Rwanda", continent: "Africa", iso: "RW" },
   { name: "Saint Kitts and Nevis", continent: "North America", iso: "KN" },
   { name: "Saint Lucia", continent: "North America", iso: "LC" },
-  { name: "Saint Vincent and the Grenadines", continent: "North America", iso: "VC" },
+  {
+    name: "Saint Vincent and the Grenadines",
+    continent: "North America",
+    iso: "VC",
+  },
   { name: "Samoa", continent: "Oceania", iso: "WS" },
   { name: "San Marino", continent: "Europe", iso: "SM" },
   { name: "Sao Tome and Principe", continent: "Africa", iso: "ST" },
@@ -469,9 +511,9 @@ export const COUNTRY_DATA: CountryData[] = [
   { name: "Yemen", continent: "Asia", iso: "YE" },
   { name: "Zambia", continent: "Africa", iso: "ZM" },
   { name: "Zimbabwe", continent: "Africa", iso: "ZW" },
-]
+];
 
-export const COUNTRIES = COUNTRY_DATA.map((c) => c.name)
+export const COUNTRIES = COUNTRY_DATA.map((c) => c.name);
 
 export function getCountriesByContinent() {
   const continents = {
@@ -481,24 +523,24 @@ export function getCountriesByContinent() {
     "North America": [] as string[],
     "South America": [] as string[],
     Oceania: [] as string[],
-  }
+  };
 
   COUNTRY_DATA.forEach((country) => {
-    continents[country.continent].push(country.name)
-  })
+    continents[country.continent].push(country.name);
+  });
 
   // Sort each continent's countries
   Object.keys(continents).forEach((continent) => {
-    continents[continent as keyof typeof continents].sort()
-  })
+    continents[continent as keyof typeof continents].sort();
+  });
 
-  return continents
+  return continents;
 }
 
 export function getCountryISO(countryName: string): string | undefined {
-  const result = COUNTRY_DATA.find((c) => c.name === countryName)?.iso
+  const result = COUNTRY_DATA.find((c) => c.name === countryName)?.iso;
   if (countryName === "Greenland") {
-    console.log("[Countries] Getting ISO for Greenland:", result)
+    console.log("[Countries] Getting ISO for Greenland:", result);
   }
-  return result
+  return result;
 }

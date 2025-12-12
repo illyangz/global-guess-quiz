@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS scores (
   score INTEGER NOT NULL,
   time_remaining INTEGER NOT NULL,
   total INTEGER NOT NULL,
+  difficulty VARCHAR(20) DEFAULT 'average',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

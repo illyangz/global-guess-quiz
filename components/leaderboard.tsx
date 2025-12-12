@@ -13,6 +13,7 @@ interface Score {
   score: number
   total: number
   time_remaining: number
+  difficulty?: string
   created_at: string
 }
 
@@ -142,7 +143,8 @@ export function Leaderboard({ onBack, highlightName }: LeaderboardProps) {
                 <TableHead className="w-12 sm:w-16 font-mono text-xs sm:text-sm">Rank</TableHead>
                 <TableHead className="font-mono text-xs sm:text-sm">Player</TableHead>
                 <TableHead className="font-mono text-right text-xs sm:text-sm">Score</TableHead>
-                <TableHead className="font-mono text-right text-xs sm:text-sm hidden sm:table-cell">Accuracy</TableHead>
+                <TableHead className="font-mono text-center text-xs sm:text-sm hidden sm:table-cell">Difficulty</TableHead>
+                <TableHead className="font-mono text-right text-xs sm:text-sm hidden md:table-cell">Accuracy</TableHead>
                 <TableHead className="font-mono text-right text-xs sm:text-sm hidden md:table-cell">Time Left</TableHead>
                 <TableHead className="font-mono text-right text-xs sm:text-sm hidden lg:table-cell">Date</TableHead>
               </TableRow>
@@ -161,6 +163,9 @@ export function Leaderboard({ onBack, highlightName }: LeaderboardProps) {
                       <Skeleton className="ml-auto h-5 w-16" />
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
+                      <Skeleton className="mx-auto h-5 w-16" />
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <Skeleton className="ml-auto h-5 w-12" />
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
@@ -173,7 +178,7 @@ export function Leaderboard({ onBack, highlightName }: LeaderboardProps) {
                 ))
               ) : scores.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="py-12 text-center">
+                  <TableCell colSpan={7} className="py-12 text-center">
                     <p className="font-mono text-xs sm:text-sm text-muted-foreground">No scores yet. Be the first!</p>
                   </TableCell>
                 </TableRow>
@@ -181,6 +186,11 @@ export function Leaderboard({ onBack, highlightName }: LeaderboardProps) {
                 scores.map((score, index) => {
                   const isHighlighted = highlightName && score.player_name === highlightName
                   const percentage = Math.round((score.score / score.total) * 100)
+                  const difficultyDisplay = score.difficulty ? score.difficulty.charAt(0).toUpperCase() + score.difficulty.slice(1) : "Average"
+                  const difficultyColor =
+                    score.difficulty === "expert" ? "text-red-600" :
+                    score.difficulty === "beginner" ? "text-green-600" :
+                    "text-blue-600"
 
                   return (
                     <TableRow key={score.id} className={isHighlighted ? "bg-primary/5" : ""}>
@@ -192,7 +202,10 @@ export function Leaderboard({ onBack, highlightName }: LeaderboardProps) {
                       <TableCell className="font-mono text-right font-semibold text-xs sm:text-sm">
                         {score.score}/{score.total}
                       </TableCell>
-                      <TableCell className="font-mono text-right text-muted-foreground text-xs sm:text-sm hidden sm:table-cell">
+                      <TableCell className={`font-mono text-center text-xs sm:text-sm font-medium hidden sm:table-cell ${difficultyColor}`}>
+                        {difficultyDisplay}
+                      </TableCell>
+                      <TableCell className="font-mono text-right text-muted-foreground text-xs sm:text-sm hidden md:table-cell">
                         {percentage}%
                       </TableCell>
                       <TableCell className="font-mono text-right text-muted-foreground text-xs sm:text-sm hidden md:table-cell">

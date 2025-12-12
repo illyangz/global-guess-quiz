@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { QuizGame } from "@/components/quiz-game"
+import { QuizGame, type Difficulty } from "@/components/quiz-game"
 import { ResultsScreen } from "@/components/results-screen"
 import { Leaderboard } from "@/components/leaderboard"
 import { Button } from "@/components/ui/button"
@@ -16,10 +16,11 @@ export default function Home() {
     score: number
     timeRemaining: number
     playerName: string
+    difficulty: Difficulty
   } | null>(null)
 
-  const handleFinish = (score: number, timeRemaining: number, playerName: string) => {
-    setResults({ score, timeRemaining, playerName })
+  const handleFinish = (score: number, timeRemaining: number, playerName: string, difficulty: Difficulty) => {
+    setResults({ score, timeRemaining, playerName, difficulty })
     setView("results")
   }
 
@@ -48,7 +49,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className="font-mono text-base sm:text-lg md:text-xl font-bold">Countries Quiz</h1>
-              <p className="font-mono text-xs text-muted-foreground hidden sm:block">Name all 197 UN member states</p>
+              <p className="font-mono text-xs text-muted-foreground hidden sm:block">Name all countries and territories worldwide</p>
             </div>
           </div>
 
@@ -70,6 +71,7 @@ export default function Home() {
             score={results.score}
             timeRemaining={results.timeRemaining}
             playerName={results.playerName}
+            difficulty={results.difficulty}
             onRestart={handleRestart}
             onViewLeaderboard={handleViewLeaderboard}
           />

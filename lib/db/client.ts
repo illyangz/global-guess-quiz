@@ -20,7 +20,13 @@ export function getPool() {
   return pool
 }
 
-export async function saveScore(playerName: string, score: number, timeRemaining: number, total: number) {
+export async function saveScore(
+  playerName: string,
+  score: number,
+  timeRemaining: number,
+  total: number,
+  difficulty: string = "average"
+) {
   const pool = getPool()
 
   if (!pool) {
@@ -30,10 +36,10 @@ export async function saveScore(playerName: string, score: number, timeRemaining
 
   try {
     const result = await pool.query(
-      `INSERT INTO scores (player_name, score, time_remaining, total)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO scores (player_name, score, time_remaining, total, difficulty)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING id, created_at`,
-      [playerName, score, timeRemaining, total]
+      [playerName, score, timeRemaining, total, difficulty]
     )
 
     console.log("[DB] Score saved successfully:", result.rows[0])
@@ -60,6 +66,7 @@ export async function getLeaderboard(limit = 100) {
         score,
         time_remaining,
         total,
+        difficulty,
         created_at
        FROM scores
        ORDER BY score DESC, time_remaining DESC, created_at ASC

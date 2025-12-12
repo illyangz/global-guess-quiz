@@ -9,16 +9,25 @@ import { Clock, Trophy } from "lucide-react"
 import { WorldMap } from "@/components/world-map"
 import { ContinentTables } from "@/components/continent-tables"
 
+export type Difficulty = "beginner" | "average" | "expert"
+
 interface QuizGameProps {
-  onFinish: (score: number, timeRemaining: number, playerName: string) => void
+  onFinish: (score: number, timeRemaining: number, playerName: string, difficulty: Difficulty) => void
+}
+
+const DIFFICULTY_TIMES: Record<Difficulty, number> = {
+  beginner: 1200, // 20 minutes
+  average: 900,   // 15 minutes
+  expert: 600,    // 10 minutes
 }
 
 export function QuizGame({ onFinish }: QuizGameProps) {
   const [started, setStarted] = useState(false)
   const [playerName, setPlayerName] = useState("")
+  const [difficulty, setDifficulty] = useState<Difficulty>("average")
   const [input, setInput] = useState("")
   const [guessedCountries, setGuessedCountries] = useState<Set<string>>(new Set())
-  const [timeLeft, setTimeLeft] = useState(900) // 15 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(900) // Will be set based on difficulty
   const [isFinished, setIsFinished] = useState(false)
   const [feedback, setFeedback] = useState<{ message: string; type: "success" | "error" } | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -54,6 +63,7 @@ export function QuizGame({ onFinish }: QuizGameProps) {
 
   const handleStart = () => {
     if (playerName.trim()) {
+      setTimeLeft(DIFFICULTY_TIMES[difficulty])
       setStarted(true)
       setTimeout(() => inputRef.current?.focus(), 100)
     }
@@ -78,6 +88,7 @@ export function QuizGame({ onFinish }: QuizGameProps) {
           score,
           timeRemaining: timeLeft,
           total: COUNTRIES.length,
+          difficulty,
         }),
       })
 
@@ -93,7 +104,7 @@ export function QuizGame({ onFinish }: QuizGameProps) {
       // Don't let database errors prevent the game from finishing
     }
 
-    onFinish(score, timeLeft, playerName)
+    onFinish(score, timeLeft, playerName, difficulty)
   }
 
   const formatTime = (seconds: number) => {
@@ -109,7 +120,9 @@ export function QuizGame({ onFinish }: QuizGameProps) {
           <div className="space-y-6">
             <div className="space-y-2 text-center">
               <h2 className="font-mono text-2xl font-bold">Name All Countries</h2>
-              <p className="text-sm text-muted-foreground">You have 15 minutes to name all 197 UN member states</p>
+              <p className="text-sm text-muted-foreground">
+                Name all {COUNTRIES.length} countries around the world
+              </p>
               <p className="text-xs text-muted-foreground">
                 Just start typing - countries are submitted automatically!
               </p>
@@ -122,6 +135,46 @@ export function QuizGame({ onFinish }: QuizGameProps) {
                 onKeyDown={(e) => e.key === "Enter" && handleStart()}
                 className="font-mono"
               />
+
+              <div className="space-y-2">
+                <label className="font-mono text-sm font-medium">Select Difficulty:</label>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    type="button"
+                    variant={difficulty === "beginner" ? "default" : "outline"}
+                    onClick={() => setDifficulty("beginner")}
+                    className="font-mono text-xs"
+                  >
+                    <div className="flex flex-col items-center">
+                      <span>Beginner</span>
+                      <span className="text-[10px] opacity-70">20 min</span>
+                    </div>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={difficulty === "average" ? "default" : "outline"}
+                    onClick={() => setDifficulty("average")}
+                    className="font-mono text-xs"
+                  >
+                    <div className="flex flex-col items-center">
+                      <span>Average</span>
+                      <span className="text-[10px] opacity-70">15 min</span>
+                    </div>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={difficulty === "expert" ? "default" : "outline"}
+                    onClick={() => setDifficulty("expert")}
+                    className="font-mono text-xs"
+                  >
+                    <div className="flex flex-col items-center">
+                      <span>Expert</span>
+                      <span className="text-[10px] opacity-70">10 min</span>
+                    </div>
+                  </Button>
+                </div>
+              </div>
+
               <Button onClick={handleStart} disabled={!playerName.trim()} className="w-full font-mono">
                 Start Quiz
               </Button>

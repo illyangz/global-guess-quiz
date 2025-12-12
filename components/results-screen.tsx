@@ -5,22 +5,32 @@ import { Card } from "@/components/ui/card"
 import { Trophy, Share2, RotateCcw } from "lucide-react"
 import { COUNTRIES } from "@/lib/countries"
 import { useState } from "react"
+import type { Difficulty } from "@/components/quiz-game"
+
+const DIFFICULTY_TIMES: Record<Difficulty, number> = {
+  beginner: 1200,
+  average: 900,
+  expert: 600,
+}
 
 interface ResultsScreenProps {
   score: number
   timeRemaining: number
   playerName: string
+  difficulty: Difficulty
   onRestart: () => void
   onViewLeaderboard: () => void
 }
 
-export function ResultsScreen({ score, timeRemaining, playerName, onRestart, onViewLeaderboard }: ResultsScreenProps) {
+export function ResultsScreen({ score, timeRemaining, playerName, difficulty, onRestart, onViewLeaderboard }: ResultsScreenProps) {
   const [copied, setCopied] = useState(false)
 
   const percentage = Math.round((score / COUNTRIES.length) * 100)
-  const timeTaken = 900 - timeRemaining
+  const totalTime = DIFFICULTY_TIMES[difficulty]
+  const timeTaken = totalTime - timeRemaining
   const minutes = Math.floor(timeTaken / 60)
   const seconds = timeTaken % 60
+  const difficultyDisplay = difficulty.charAt(0).toUpperCase() + difficulty.slice(1)
 
   const getRank = () => {
     if (score === COUNTRIES.length) return "Perfect Score!"
@@ -32,7 +42,7 @@ export function ResultsScreen({ score, timeRemaining, playerName, onRestart, onV
   }
 
   const handleShare = async () => {
-    const shareText = `I named ${score}/${COUNTRIES.length} countries (${percentage}%) in ${minutes}m ${seconds}s!\n\nCan you beat my score?`
+    const shareText = `I named ${score}/${COUNTRIES.length} countries (${percentage}%) in ${minutes}m ${seconds}s on ${difficultyDisplay} difficulty!\n\nCan you beat my score?`
 
     if (navigator.share) {
       try {
@@ -67,7 +77,7 @@ export function ResultsScreen({ score, timeRemaining, playerName, onRestart, onV
           </div>
 
           {/* Stats */}
-          <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
             <Card className="bg-muted/50 p-3 sm:p-4 text-center">
               <div className="font-mono text-2xl sm:text-3xl font-bold text-foreground">{score}</div>
               <div className="font-mono text-xs text-muted-foreground">Countries Named</div>
@@ -83,6 +93,17 @@ export function ResultsScreen({ score, timeRemaining, playerName, onRestart, onV
                 {minutes}:{seconds.toString().padStart(2, "0")}
               </div>
               <div className="font-mono text-xs text-muted-foreground">Time Taken</div>
+            </Card>
+
+            <Card className="bg-muted/50 p-3 sm:p-4 text-center">
+              <div className={`font-mono text-xl sm:text-2xl font-bold ${
+                difficulty === "expert" ? "text-red-600" :
+                difficulty === "beginner" ? "text-green-600" :
+                "text-blue-600"
+              }`}>
+                {difficultyDisplay}
+              </div>
+              <div className="font-mono text-xs text-muted-foreground">Difficulty</div>
             </Card>
           </div>
 
