@@ -8,7 +8,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Countries Quiz - Name All 197 UN Member States",
+  title: "Countries Quiz - Name All Countries Around The World",
   description:
     "Test your geography knowledge by naming all 197 UN member countries in 15 minutes. Challenge yourself and share your score on the leaderboard!",
 
