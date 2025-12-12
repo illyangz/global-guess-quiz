@@ -28,15 +28,15 @@ export function ContinentTables({ guessedCountries, isFinished = false }: Contin
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {continentOrder.map((continent) => {
         const countries = continents[continent]
         const stats = getContinentStats(continent)
 
         return (
-          <Card key={continent} className="p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-mono text-sm font-bold">{continent}</h3>
+          <Card key={continent} className="p-3 sm:p-4">
+            <div className="mb-2 sm:mb-3 flex items-center justify-between">
+              <h3 className="font-mono text-xs sm:text-sm font-bold">{continent}</h3>
               <span className="font-mono text-xs text-muted-foreground">
                 {stats.guessed}/{stats.total}
               </span>
@@ -52,14 +52,14 @@ export function ContinentTables({ guessedCountries, isFinished = false }: Contin
                 return (
                   <div
                     key={country}
-                    className={`flex items-center gap-2 rounded px-2 py-1 font-mono transition-colors ${
+                    className={`flex items-center gap-1.5 sm:gap-2 rounded px-2 py-1 font-mono transition-colors ${
                       isGuessed
                         ? "bg-green-500/10 text-green-700 dark:text-green-400"
                         : "bg-red-500/10 text-red-700 dark:text-red-400"
                     }`}
                   >
                     {isGuessed ? <Check className="h-3 w-3 flex-shrink-0" /> : <X className="h-3 w-3 flex-shrink-0" />}
-                    <span>{country}</span>
+                    <span className="truncate">{country}</span>
                   </div>
                 )
               })}

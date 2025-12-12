@@ -31,9 +31,22 @@ export function WorldMap({ guessedCountries, isFinished = false, allCountries = 
 
           const svg = containerRef.current.querySelector("svg")
           if (svg) {
+            // Get original dimensions
+            const width = svg.getAttribute("width")
+            const height = svg.getAttribute("height")
+
+            // Set viewBox based on original dimensions if not present
+            if (!svg.getAttribute("viewBox") && width && height) {
+              svg.setAttribute("viewBox", `0 0 ${width} ${height}`)
+            }
+
+            // Remove fixed width/height and make it responsive
+            svg.removeAttribute("width")
+            svg.removeAttribute("height")
             svg.style.width = "100%"
-            svg.style.height = "auto"
+            svg.style.height = "100%"
             svg.style.display = "block"
+            svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
           }
 
           colorCountries()
@@ -108,18 +121,18 @@ export function WorldMap({ guessedCountries, isFinished = false, allCountries = 
   }
 
   return (
-    <Card className="relative w-full overflow-hidden bg-slate-50 p-6">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+    <Card className="relative w-full overflow-hidden bg-slate-50 p-4 sm:p-6">
+      <div className="space-y-3 sm:space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="font-mono text-sm font-medium">World Map</h3>
-          <div className="flex items-center gap-4 font-mono text-sm">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 sm:gap-4 font-mono text-xs sm:text-sm">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="h-3 w-3 rounded-sm bg-green-500" />
               <span className="text-muted-foreground">Guessed: </span>
               <span className="font-bold">{guessedCountries.size}</span>
             </div>
             {isFinished && missedCountries.length > 0 && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <div className="h-3 w-3 rounded-sm bg-red-500" />
                 <span className="text-muted-foreground">Missed: </span>
                 <span className="font-bold">{missedCountries.length}</span>
@@ -130,7 +143,7 @@ export function WorldMap({ guessedCountries, isFinished = false, allCountries = 
 
         <div
           ref={containerRef}
-          className="relative w-full rounded-lg overflow-hidden bg-white border border-gray-200 min-h-[400px] flex items-center justify-center"
+          className="relative w-full rounded-lg overflow-hidden bg-white border border-gray-200 min-h-[250px] sm:min-h-[350px] md:min-h-[400px] lg:min-h-[450px]"
         />
 
         <p className="text-center font-mono text-xs text-muted-foreground">

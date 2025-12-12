@@ -54,32 +54,32 @@ export function ResultsScreen({ score, timeRemaining, playerName, onRestart, onV
   }
 
   return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <Card className="w-full max-w-2xl p-8">
-        <div className="space-y-8">
+    <div className="flex min-h-[60vh] items-center justify-center px-4">
+      <Card className="w-full max-w-2xl p-6 sm:p-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Header */}
           <div className="space-y-2 text-center">
             <div className="flex justify-center">
-              <Trophy className="h-16 w-16 text-amber-500" />
+              <Trophy className="h-12 w-12 sm:h-16 sm:w-16 text-amber-500" />
             </div>
-            <h2 className="font-mono text-3xl font-bold">{getRank()}</h2>
-            <p className="font-mono text-sm text-muted-foreground">Great job, {playerName}!</p>
+            <h2 className="font-mono text-2xl sm:text-3xl font-bold">{getRank()}</h2>
+            <p className="font-mono text-xs sm:text-sm text-muted-foreground">Great job, {playerName}!</p>
           </div>
 
           {/* Stats */}
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Card className="bg-muted/50 p-4 text-center">
-              <div className="font-mono text-3xl font-bold text-foreground">{score}</div>
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
+            <Card className="bg-muted/50 p-3 sm:p-4 text-center">
+              <div className="font-mono text-2xl sm:text-3xl font-bold text-foreground">{score}</div>
               <div className="font-mono text-xs text-muted-foreground">Countries Named</div>
             </Card>
 
-            <Card className="bg-muted/50 p-4 text-center">
-              <div className="font-mono text-3xl font-bold text-foreground">{percentage}%</div>
+            <Card className="bg-muted/50 p-3 sm:p-4 text-center">
+              <div className="font-mono text-2xl sm:text-3xl font-bold text-foreground">{percentage}%</div>
               <div className="font-mono text-xs text-muted-foreground">Completion</div>
             </Card>
 
-            <Card className="bg-muted/50 p-4 text-center">
-              <div className="font-mono text-3xl font-bold text-foreground">
+            <Card className="bg-muted/50 p-3 sm:p-4 text-center">
+              <div className="font-mono text-2xl sm:text-3xl font-bold text-foreground">
                 {minutes}:{seconds.toString().padStart(2, "0")}
               </div>
               <div className="font-mono text-xs text-muted-foreground">Time Taken</div>
@@ -88,15 +88,15 @@ export function ResultsScreen({ score, timeRemaining, playerName, onRestart, onV
 
           {/* Actions */}
           <div className="grid gap-3 sm:grid-cols-2">
-            <Button onClick={handleShare} variant="outline" className="font-mono bg-transparent">
+            <Button onClick={handleShare} variant="outline" className="font-mono bg-transparent text-sm sm:text-base">
               <Share2 className="mr-2 h-4 w-4" />
               {copied ? "Copied!" : "Share Score"}
             </Button>
-            <Button onClick={onViewLeaderboard} variant="outline" className="font-mono bg-transparent">
+            <Button onClick={onViewLeaderboard} variant="outline" className="font-mono bg-transparent text-sm sm:text-base">
               <Trophy className="mr-2 h-4 w-4" />
               View Leaderboard
             </Button>
-            <Button onClick={onRestart} className="sm:col-span-2 font-mono">
+            <Button onClick={onRestart} className="sm:col-span-2 font-mono text-sm sm:text-base">
               <RotateCcw className="mr-2 h-4 w-4" />
               Play Again
             </Button>

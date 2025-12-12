@@ -133,23 +133,23 @@ export function QuizGame({ onFinish }: QuizGameProps) {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
+    <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6">
       {/* Stats Bar */}
-      <div className="flex items-center justify-between gap-4">
-        <Card className="flex items-center gap-3 px-4 py-3">
-          <Trophy className="h-5 w-5 text-amber-500" />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+        <Card className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3">
+          <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 flex-shrink-0" />
           <div className="font-mono text-sm">
-            <span className="text-2xl font-bold">{guessedCountries.size}</span>
+            <span className="text-xl sm:text-2xl font-bold">{guessedCountries.size}</span>
             <span className="text-muted-foreground">/{COUNTRIES.length}</span>
           </div>
         </Card>
 
-        <Card className="flex items-center gap-3 px-4 py-3">
-          <Clock className="h-5 w-5 text-blue-500" />
-          <div className="font-mono text-2xl font-bold">{formatTime(timeLeft)}</div>
+        <Card className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3">
+          <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+          <div className="font-mono text-xl sm:text-2xl font-bold">{formatTime(timeLeft)}</div>
         </Card>
 
-        <Button onClick={handleFinish} variant="outline" className="font-mono bg-transparent">
+        <Button onClick={handleFinish} variant="outline" className="font-mono bg-transparent py-2.5 sm:py-3">
           Give Up
         </Button>
       </div>
@@ -157,25 +157,25 @@ export function QuizGame({ onFinish }: QuizGameProps) {
       <WorldMap guessedCountries={guessedCountries} isFinished={isFinished} allCountries={COUNTRIES} />
 
       {/* Input Area */}
-      <Card className="p-6">
-        <div className="space-y-4">
+      <Card className="p-4 sm:p-6">
+        <div className="space-y-3 sm:space-y-4">
           <div className="space-y-2">
-            <label className="font-mono text-sm font-medium">
-              Type a country name: <span className="text-muted-foreground">(auto-submits when valid)</span>
+            <label className="font-mono text-xs sm:text-sm font-medium">
+              Type a country name: <span className="text-muted-foreground hidden sm:inline">(auto-submits when valid)</span>
             </label>
             <Input
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="e.g. France, UK, USA, Japan..."
-              className="font-mono text-lg"
+              className="font-mono text-base sm:text-lg"
               disabled={isFinished}
             />
           </div>
 
           {feedback && (
             <div
-              className={`rounded-md border px-4 py-2 font-mono text-sm ${
+              className={`rounded-md border px-3 sm:px-4 py-2 font-mono text-xs sm:text-sm ${
                 feedback.type === "success"
                   ? "border-green-500/50 bg-green-500/10 text-green-600"
                   : "border-red-500/50 bg-red-500/10 text-red-600"

@@ -91,17 +91,17 @@ export function Leaderboard({ onBack, highlightName }: LeaderboardProps) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-4 sm:space-y-6 px-4 sm:px-0">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Button onClick={onBack} variant="ghost" size="icon">
-            <ArrowLeft className="h-5 w-5" />
+      <div className="flex items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Button onClick={onBack} variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10">
+            <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
-          <h1 className="font-mono text-3xl font-bold">Leaderboard</h1>
+          <h1 className="font-mono text-xl sm:text-2xl md:text-3xl font-bold">Leaderboard</h1>
         </div>
 
-        <Button onClick={fetchScores} variant="outline" size="icon" disabled={loading} className="bg-transparent">
+        <Button onClick={fetchScores} variant="outline" size="icon" disabled={loading} className="bg-transparent h-9 w-9 sm:h-10 sm:w-10">
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
         </Button>
       </div>
@@ -112,21 +112,21 @@ export function Leaderboard({ onBack, highlightName }: LeaderboardProps) {
           <Button
             onClick={() => setFilter("all")}
             variant={filter === "all" ? "default" : "ghost"}
-            className="flex-1 font-mono text-sm"
+            className="flex-1 font-mono text-xs sm:text-sm"
           >
             All Time
           </Button>
           <Button
             onClick={() => setFilter("week")}
             variant={filter === "week" ? "default" : "ghost"}
-            className="flex-1 font-mono text-sm"
+            className="flex-1 font-mono text-xs sm:text-sm"
           >
             This Week
           </Button>
           <Button
             onClick={() => setFilter("today")}
             variant={filter === "today" ? "default" : "ghost"}
-            className="flex-1 font-mono text-sm"
+            className="flex-1 font-mono text-xs sm:text-sm"
           >
             Today
           </Button>
@@ -134,76 +134,80 @@ export function Leaderboard({ onBack, highlightName }: LeaderboardProps) {
       </Card>
 
       {/* Leaderboard Table */}
-      <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-16 font-mono">Rank</TableHead>
-              <TableHead className="font-mono">Player</TableHead>
-              <TableHead className="font-mono text-right">Score</TableHead>
-              <TableHead className="font-mono text-right">Accuracy</TableHead>
-              <TableHead className="font-mono text-right">Time Left</TableHead>
-              <TableHead className="font-mono text-right">Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              Array.from({ length: 10 }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell>
-                    <Skeleton className="h-5 w-8" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-5 w-32" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="ml-auto h-5 w-16" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="ml-auto h-5 w-12" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="ml-auto h-5 w-16" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="ml-auto h-5 w-20" />
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : scores.length === 0 ? (
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={6} className="py-12 text-center">
-                  <p className="font-mono text-sm text-muted-foreground">No scores yet. Be the first!</p>
-                </TableCell>
+                <TableHead className="w-12 sm:w-16 font-mono text-xs sm:text-sm">Rank</TableHead>
+                <TableHead className="font-mono text-xs sm:text-sm">Player</TableHead>
+                <TableHead className="font-mono text-right text-xs sm:text-sm">Score</TableHead>
+                <TableHead className="font-mono text-right text-xs sm:text-sm hidden sm:table-cell">Accuracy</TableHead>
+                <TableHead className="font-mono text-right text-xs sm:text-sm hidden md:table-cell">Time Left</TableHead>
+                <TableHead className="font-mono text-right text-xs sm:text-sm hidden lg:table-cell">Date</TableHead>
               </TableRow>
-            ) : (
-              scores.map((score, index) => {
-                const isHighlighted = highlightName && score.player_name === highlightName
-                const percentage = Math.round((score.score / score.total) * 100)
-
-                return (
-                  <TableRow key={score.id} className={isHighlighted ? "bg-primary/5" : ""}>
-                    <TableCell className="font-mono">{getRankIcon(index)}</TableCell>
-                    <TableCell className="font-mono font-medium">
-                      {score.player_name}
-                      {isHighlighted && <span className="ml-2 text-xs text-primary">(You)</span>}
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                Array.from({ length: 10 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Skeleton className="h-5 w-8" />
                     </TableCell>
-                    <TableCell className="font-mono text-right font-semibold">
-                      {score.score}/{score.total}
+                    <TableCell>
+                      <Skeleton className="h-5 w-32" />
                     </TableCell>
-                    <TableCell className="font-mono text-right text-muted-foreground">{percentage}%</TableCell>
-                    <TableCell className="font-mono text-right text-muted-foreground">
-                      {formatTime(score.time_remaining)}
+                    <TableCell>
+                      <Skeleton className="ml-auto h-5 w-16" />
                     </TableCell>
-                    <TableCell className="font-mono text-right text-xs text-muted-foreground">
-                      {formatDate(score.created_at)}
+                    <TableCell className="hidden sm:table-cell">
+                      <Skeleton className="ml-auto h-5 w-12" />
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      <Skeleton className="ml-auto h-5 w-16" />
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      <Skeleton className="ml-auto h-5 w-20" />
                     </TableCell>
                   </TableRow>
-                )
-              })
-            )}
-          </TableBody>
-        </Table>
+                ))
+              ) : scores.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-12 text-center">
+                    <p className="font-mono text-xs sm:text-sm text-muted-foreground">No scores yet. Be the first!</p>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                scores.map((score, index) => {
+                  const isHighlighted = highlightName && score.player_name === highlightName
+                  const percentage = Math.round((score.score / score.total) * 100)
+
+                  return (
+                    <TableRow key={score.id} className={isHighlighted ? "bg-primary/5" : ""}>
+                      <TableCell className="font-mono text-xs sm:text-sm">{getRankIcon(index)}</TableCell>
+                      <TableCell className="font-mono font-medium text-xs sm:text-sm">
+                        {score.player_name}
+                        {isHighlighted && <span className="ml-2 text-xs text-primary">(You)</span>}
+                      </TableCell>
+                      <TableCell className="font-mono text-right font-semibold text-xs sm:text-sm">
+                        {score.score}/{score.total}
+                      </TableCell>
+                      <TableCell className="font-mono text-right text-muted-foreground text-xs sm:text-sm hidden sm:table-cell">
+                        {percentage}%
+                      </TableCell>
+                      <TableCell className="font-mono text-right text-muted-foreground text-xs sm:text-sm hidden md:table-cell">
+                        {formatTime(score.time_remaining)}
+                      </TableCell>
+                      <TableCell className="font-mono text-right text-xs text-muted-foreground hidden lg:table-cell">
+                        {formatDate(score.created_at)}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </Card>
 
       {scores.length > 0 && (
