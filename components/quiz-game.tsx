@@ -133,7 +133,9 @@ export function QuizGame({ onFinish }: QuizGameProps) {
                 Name All Countries
               </h2>
               <p className="text-sm text-muted-foreground">
-                Can you name the countries around the world?
+                {/* lets put a total number of countries that we have */}
+                Can you name all {COUNTRIES.length} countries and territories in
+                the world?
               </p>
               <p className="text-xs text-muted-foreground">
                 Just start typing - countries are submitted automatically!

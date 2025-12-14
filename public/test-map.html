@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Map Testing Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .map-container {
+            grid-column: 1 / -1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        #map-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            background: white;
+        }
+
+        #map-wrapper svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        #map-wrapper svg path {
+            stroke: #fff;
+            stroke-width: 0.5;
+            transition: fill 0.2s ease;
+        }
+
+        #map-wrapper svg path:hover {
+            stroke: #000;
+            stroke-width: 1.5;
+        }
+
+        .continent-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .continent-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .continent-count {
+            font-size: 0.8em;
+            color: #666;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .country-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        .country-item {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid transparent;
+        }
+
+        .country-item:hover {
+            background: #e3f2fd;
+            transform: translateX(5px);
+            border-color: #667eea;
+        }
+
+        .country-item.mapped {
+            border-left: 4px solid #22c55e;
+        }
+
+        .country-item.unmapped {
+            border-left: 4px solid #ef4444;
+            background: #fff5f5;
+        }
+
+        .iso-code {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 0.85em;
+            min-width: 30px;
+        }
+
+        .country-name {
+            flex: 1;
+            font-size: 0.95em;
+        }
+
+        .status-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .legend {
+            grid-column: 1 / -1;
+            background: #fffbeb;
+            border: 2px solid #fbbf24;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .legend h3 {
+            margin-bottom: 15px;
+            color: #92400e;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-box {
+            width: 30px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+
+        .instructions {
+            grid-column: 1 / -1;
+            background: #e0f2fe;
+            border: 2px solid #0284c7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 10px;
+        }
+
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #0c4a6e;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            color: #075985;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+        }
+
+        .highlight {
+            fill: #3b82f6 !important;
+            stroke: #1e40af !important;
+            stroke-width: 2 !important;
+        }
+
+        .default-color {
+            fill: #d1d5db;
+        }
+
+        .country-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1000;
+            white-space: nowrap;
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="country-tooltip" id="country-tooltip"></div>
+    <div class="container">
+        <header>
+            <h1>🗺️ Country Map Testing Tool</h1>
+            <div class="stats">
+                <div class="stat-box">
+                    <span class="stat-number" id="total-countries">0</span>
+                    <span>Total Countries</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="mapped-countries">0</span>
+                    <span>Mapped in SVG</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="unmapped-countries">0</span>
+                    <span>Not in SVG</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="instructions">
+                <h3>📋 How to Use This Tool</h3>
+                <ul>
+                    <li><strong>Hover over country names</strong> to highlight them on the map</li>
+                    <li><strong>Green border</strong> = Country is found in the SVG map</li>
+                    <li><strong>Red border</strong> = Country is NOT found in the SVG (needs attention)</li>
+                    <li><strong>ISO codes</strong> are shown for each country (these are used to match SVG paths)</li>
+                    <li>Check the stats at the top to see coverage percentage</li>
+                </ul>
+            </div>
+
+            <div class="map-container">
+                <h2 style="margin-bottom: 15px; text-align: center;">World Map</h2>
+                <div id="map-wrapper">
+                    <p style="text-align: center; padding: 40px; color: #666;">Loading map...</p>
+                </div>
+            </div>
+
+            <div style="grid-column: 1 / -1; background: #f0fdf4; border: 2px solid #22c55e; border-radius: 8px; padding: 20px; margin-bottom: 10px;">
+                <h3 style="margin-bottom: 15px; color: #166534;">🧪 Test Country Aliases</h3>
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                    <input
+                        type="text"
+                        id="alias-test-input"
+                        placeholder="Type a country name or alias (e.g., Svalbard, UK, USA)..."
+                        style="flex: 1; padding: 10px; border: 2px solid #22c55e; border-radius: 5px; font-size: 14px;"
+                    />
+                </div>
+                <div id="alias-result" style="padding: 10px; background: white; border-radius: 5px; min-height: 40px; display: flex; align-items: center; font-family: monospace;"></div>
+            </div>
+
+            <div class="legend">
+                <h3>🎨 Color Legend</h3>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #d1d5db;"></div>
+                        <span>Default (not highlighted)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #3b82f6;"></div>
+                        <span>Hovered/Selected country</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: white; border-left: 4px solid #22c55e;"></div>
+                        <span>Country found in SVG</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: #fff5f5; border-left: 4px solid #ef4444;"></div>
+                        <span>Country NOT in SVG</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="continents-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Country data from lib/countries.ts
+        const COUNTRY_DATA = [
+            { name: "Afghanistan", continent: "Asia", iso: "AF" },
+            { name: "Albania", continent: "Europe", iso: "AL" },
+            { name: "Algeria", continent: "Africa", iso: "DZ" },
+            { name: "Greenland", continent: "North America", iso: "GL" },
+            { name: "Andorra", continent: "Europe", iso: "AD" },
+            { name: "Angola", continent: "Africa", iso: "AO" },
+            { name: "Antigua and Barbuda", continent: "North America", iso: "AG" },
+            { name: "Argentina", continent: "South America", iso: "AR" },
+            { name: "Armenia", continent: "Asia", iso: "AM" },
+            { name: "Aruba", continent: "North America", iso: "AW" },
+            { name: "Australia", continent: "Oceania", iso: "AU" },
+            { name: "Austria", continent: "Europe", iso: "AT" },
+            { name: "Azerbaijan", continent: "Asia", iso: "AZ" },
+            { name: "Bahamas", continent: "North America", iso: "BS" },
+            { name: "Bahrain", continent: "Asia", iso: "BH" },
+            { name: "Bangladesh", continent: "Asia", iso: "BD" },
+            { name: "Barbados", continent: "North America", iso: "BB" },
+            { name: "Belarus", continent: "Europe", iso: "BY" },
+            { name: "Belgium", continent: "Europe", iso: "BE" },
+            { name: "Belize", continent: "North America", iso: "BZ" },
+            { name: "Benin", continent: "Africa", iso: "BJ" },
+            { name: "Bermuda", continent: "North America", iso: "BM" },
+            { name: "Bhutan", continent: "Asia", iso: "BT" },
+            { name: "Bolivia", continent: "South America", iso: "BO" },
+            { name: "Bosnia and Herzegovina", continent: "Europe", iso: "BA" },
+            { name: "Botswana", continent: "Africa", iso: "BW" },
+            { name: "Brazil", continent: "South America", iso: "BR" },
+            { name: "Brunei", continent: "Asia", iso: "BN" },
+            { name: "Bulgaria", continent: "Europe", iso: "BG" },
+            { name: "Burkina Faso", continent: "Africa", iso: "BF" },
+            { name: "Burundi", continent: "Africa", iso: "BI" },
+            { name: "Cabo Verde", continent: "Africa", iso: "CV" },
+            { name: "Cambodia", continent: "Asia", iso: "KH" },
+            { name: "Cameroon", continent: "Africa", iso: "CM" },
+            { name: "Canada", continent: "North America", iso: "CA" },
+            { name: "Central African Republic", continent: "Africa", iso: "CF" },
+            { name: "Chad", continent: "Africa", iso: "TD" },
+            { name: "Chile", continent: "South America", iso: "CL" },
+            { name: "China", continent: "Asia", iso: "CN" },
+            { name: "Colombia", continent: "South America", iso: "CO" },
+            { name: "Comoros", continent: "Africa", iso: "KM" },
+            { name: "Congo", continent: "Africa", iso: "CG" },
+            { name: "Cook Islands", continent: "Oceania", iso: "CK" },
+            { name: "Costa Rica", continent: "North America", iso: "CR" },
+            { name: "Croatia", continent: "Europe", iso: "HR" },
+            { name: "Cuba", continent: "North America", iso: "CU" },
+            { name: "Cyprus", continent: "Europe", iso: "CY" },
+            { name: "Czech Republic", continent: "Europe", iso: "CZ" },
+            { name: "Democratic Republic of the Congo", continent: "Africa", iso: "CD" },
+            { name: "Denmark", continent: "Europe", iso: "DK" },
+            { name: "Djibouti", continent: "Africa", iso: "DJ" },
+            { name: "Dominica", continent: "North America", iso: "DM" },
+            { name: "Dominican Republic", continent: "North America", iso: "DO" },
+            { name: "East Timor", continent: "Asia", iso: "TL" },
+            { name: "Ecuador", continent: "South America", iso: "EC" },
+            { name: "Egypt", continent: "Africa", iso: "EG" },
+            { name: "El Salvador", continent: "North America", iso: "SV" },
+            { name: "Equatorial Guinea", continent: "Africa", iso: "GQ" },
+            { name: "Eritrea", continent: "Africa", iso: "ER" },
+            { name: "Estonia", continent: "Europe", iso: "EE" },
+            { name: "Eswatini", continent: "Africa", iso: "SZ" },
+            { name: "Ethiopia", continent: "Africa", iso: "ET" },
+            { name: "Fiji", continent: "Oceania", iso: "FJ" },
+            { name: "Finland", continent: "Europe", iso: "FI" },
+            { name: "France", continent: "Europe", iso: "FR" },
+            { name: "French Guiana", continent: "South America", iso: "GF" },
+            { name: "Gabon", continent: "Africa", iso: "GA" },
+            { name: "Gambia", continent: "Africa", iso: "GM" },
+            { name: "Georgia", continent: "Asia", iso: "GE" },
+            { name: "Germany", continent: "Europe", iso: "DE" },
+            { name: "Ghana", continent: "Africa", iso: "GH" },
+            { name: "Greece", continent: "Europe", iso: "GR" },
+            { name: "Grenada", continent: "North America", iso: "GD" },
+            { name: "Guatemala", continent: "North America", iso: "GT" },
+            { name: "Guinea", continent: "Africa", iso: "GN" },
+            { name: "Guinea-Bissau", continent: "Africa", iso: "GW" },
+            { name: "Guyana", continent: "South America", iso: "GY" },
+            { name: "Haiti", continent: "North America", iso: "HT" },
+            { name: "Honduras", continent: "North America", iso: "HN" },
+            { name: "Hungary", continent: "Europe", iso: "HU" },
+            { name: "Iceland", continent: "Europe", iso: "IS" },
+            { name: "India", continent: "Asia", iso: "IN" },
+            { name: "Indonesia", continent: "Asia", iso: "ID" },
+            { name: "Iran", continent: "Asia", iso: "IR" },
+            { name: "Iraq", continent: "Asia", iso: "IQ" },
+            { name: "Ireland", continent: "Europe", iso: "IE" },
+            { name: "Italy", continent: "Europe", iso: "IT" },
+            { name: "Ivory Coast", continent: "Africa", iso: "CI" },
+            { name: "Jamaica", continent: "North America", iso: "JM" },
+            { name: "Japan", continent: "Asia", iso: "JP" },
+            { name: "Jordan", continent: "Asia", iso: "JO" },
+            { name: "Kazakhstan", continent: "Asia", iso: "KZ" },
+            { name: "Kenya", continent: "Africa", iso: "KE" },
+            { name: "Kiribati", continent: "Oceania", iso: "KI" },
+            { name: "Kosovo", continent: "Europe", iso: "XK" },
+            { name: "Kuwait", continent: "Asia", iso: "KW" },
+            { name: "Kyrgyzstan", continent: "Asia", iso: "KG" },
+            { name: "Laos", continent: "Asia", iso: "LA" },
+            { name: "Latvia", continent: "Europe", iso: "LV" },
+            { name: "Lebanon", continent: "Asia", iso: "LB" },
+            { name: "Lesotho", continent: "Africa", iso: "LS" },
+            { name: "Liberia", continent: "Africa", iso: "LR" },
+            { name: "Libya", continent: "Africa", iso: "LY" },
+            { name: "Liechtenstein", continent: "Europe", iso: "LI" },
+            { name: "Lithuania", continent: "Europe", iso: "LT" },
+            { name: "Luxembourg", continent: "Europe", iso: "LU" },
+            { name: "Madagascar", continent: "Africa", iso: "MG" },
+            { name: "Malawi", continent: "Africa", iso: "MW" },
+            { name: "Malaysia", continent: "Asia", iso: "MY" },
+            { name: "Maldives", continent: "Asia", iso: "MV" },
+            { name: "Mali", continent: "Africa", iso: "ML" },
+            { name: "Malta", continent: "Europe", iso: "MT" },
+            { name: "Marshall Islands", continent: "Oceania", iso: "MH" },
+            { name: "Mauritania", continent: "Africa", iso: "MR" },
+            { name: "Mauritius", continent: "Africa", iso: "MU" },
+            { name: "Mexico", continent: "North America", iso: "MX" },
+            { name: "Micronesia", continent: "Oceania", iso: "FM" },
+            { name: "Moldova", continent: "Europe", iso: "MD" },
+            { name: "Monaco", continent: "Europe", iso: "MC" },
+            { name: "Mongolia", continent: "Asia", iso: "MN" },
+            { name: "Montenegro", continent: "Europe", iso: "ME" },
+            { name: "Morocco", continent: "Africa", iso: "MA" },
+            { name: "Mozambique", continent: "Africa", iso: "MZ" },
+            { name: "Myanmar", continent: "Asia", iso: "MM" },
+            { name: "Namibia", continent: "Africa", iso: "NA" },
+            { name: "Nauru", continent: "Oceania", iso: "NR" },
+            { name: "Nepal", continent: "Asia", iso: "NP" },
+            { name: "Netherlands", continent: "Europe", iso: "NL" },
+            { name: "New Zealand", continent: "Oceania", iso: "NZ" },
+            { name: "Nicaragua", continent: "North America", iso: "NI" },
+            { name: "Niger", continent: "Africa", iso: "NE" },
+            { name: "Nigeria", continent: "Africa", iso: "NG" },
+            { name: "North Korea", continent: "Asia", iso: "KP" },
+            { name: "North Macedonia", continent: "Europe", iso: "MK" },
+            { name: "Norway", continent: "Europe", iso: "NO" },
+            { name: "Oman", continent: "Asia", iso: "OM" },
+            { name: "Pakistan", continent: "Asia", iso: "PK" },
+            { name: "Palau", continent: "Oceania", iso: "PW" },
+            { name: "Palestine", continent: "Asia", iso: "PS" },
+            { name: "Panama", continent: "North America", iso: "PA" },
+            { name: "Papua New Guinea", continent: "Oceania", iso: "PG" },
+            { name: "Paraguay", continent: "South America", iso: "PY" },
+            { name: "Peru", continent: "South America", iso: "PE" },
+            { name: "Philippines", continent: "Asia", iso: "PH" },
+            { name: "Poland", continent: "Europe", iso: "PL" },
+            { name: "Portugal", continent: "Europe", iso: "PT" },
+            { name: "Puerto Rico", continent: "North America", iso: "PR" },
+            { name: "Qatar", continent: "Asia", iso: "QA" },
+            { name: "Romania", continent: "Europe", iso: "RO" },
+            { name: "Russia", continent: "Europe", iso: "RU" },
+            { name: "Rwanda", continent: "Africa", iso: "RW" },
+            { name: "Saint Kitts and Nevis", continent: "North America", iso: "KN" },
+            { name: "Saint Lucia", continent: "North America", iso: "LC" },
+            { name: "Saint Vincent and the Grenadines", continent: "North America", iso: "VC" },
+            { name: "Samoa", continent: "Oceania", iso: "WS" },
+            { name: "San Marino", continent: "Europe", iso: "SM" },
+            { name: "Sao Tome and Principe", continent: "Africa", iso: "ST" },
+            { name: "Saudi Arabia", continent: "Asia", iso: "SA" },
+            { name: "Senegal", continent: "Africa", iso: "SN" },
+            { name: "Serbia", continent: "Europe", iso: "RS" },
+            { name: "Seychelles", continent: "Africa", iso: "SC" },
+            { name: "Sierra Leone", continent: "Africa", iso: "SL" },
+            { name: "Singapore", continent: "Asia", iso: "SG" },
+            { name: "Slovakia", continent: "Europe", iso: "SK" },
+            { name: "Slovenia", continent: "Europe", iso: "SI" },
+            { name: "Solomon Islands", continent: "Oceania", iso: "SB" },
+            { name: "Somalia", continent: "Africa", iso: "SO" },
+            { name: "South Africa", continent: "Africa", iso: "ZA" },
+            { name: "South Korea", continent: "Asia", iso: "KR" },
+            { name: "South Sudan", continent: "Africa", iso: "SS" },
+            { name: "Spain", continent: "Europe", iso: "ES" },
+            { name: "Sri Lanka", continent: "Asia", iso: "LK" },
+            { name: "Sudan", continent: "Africa", iso: "SD" },
+            { name: "Suriname", continent: "South America", iso: "SR" },
+            { name: "Sweden", continent: "Europe", iso: "SE" },
+            { name: "Switzerland", continent: "Europe", iso: "CH" },
+            { name: "Syria", continent: "Asia", iso: "SY" },
+            { name: "Taiwan", continent: "Asia", iso: "TW" },
+            { name: "Tajikistan", continent: "Asia", iso: "TJ" },
+            { name: "Tanzania", continent: "Africa", iso: "TZ" },
+            { name: "Thailand", continent: "Asia", iso: "TH" },
+            { name: "Timor-Leste", continent: "Asia", iso: "TL" },
+            { name: "Togo", continent: "Africa", iso: "TG" },
+            { name: "Tonga", continent: "Oceania", iso: "TO" },
+            { name: "Trinidad and Tobago", continent: "North America", iso: "TT" },
+            { name: "Tunisia", continent: "Africa", iso: "TN" },
+            { name: "Turkey", continent: "Asia", iso: "TR" },
+            { name: "Turkmenistan", continent: "Asia", iso: "TM" },
+            { name: "Tuvalu", continent: "Oceania", iso: "TV" },
+            { name: "Uganda", continent: "Africa", iso: "UG" },
+            { name: "Ukraine", continent: "Europe", iso: "UA" },
+            { name: "United Arab Emirates", continent: "Asia", iso: "AE" },
+            { name: "United Kingdom", continent: "Europe", iso: "GB" },
+            { name: "United States", continent: "North America", iso: "US" },
+            { name: "Uruguay", continent: "South America", iso: "UY" },
+            { name: "Uzbekistan", continent: "Asia", iso: "UZ" },
+            { name: "Vanuatu", continent: "Oceania", iso: "VU" },
+            { name: "Vatican City", continent: "Europe", iso: "VA" },
+            { name: "Venezuela", continent: "South America", iso: "VE" },
+            { name: "Vietnam", continent: "Asia", iso: "VN" },
+            { name: "Western Sahara", continent: "Africa", iso: "EH" },
+            { name: "Yemen", continent: "Asia", iso: "YE" },
+            { name: "Zambia", continent: "Africa", iso: "ZM" },
+            { name: "Zimbabwe", continent: "Africa", iso: "ZW" }
+        ];
+
+        let svgDoc = null;
+        let currentHighlights = [];
+
+        // Country aliases for testing
+        const COUNTRY_ALIASES = {
+            "United States": ["USA", "US", "United States of America", "America", "U.S.A", "U.S", "States"],
+            "United Kingdom": ["UK", "Britain", "Great Britain", "England", "U.K", "GB"],
+            "Democratic Republic of the Congo": ["DRC", "DR Congo", "Congo-Kinshasa", "Congo Kinshasa", "Zaire"],
+            "Congo": ["Republic of Congo", "Congo-Brazzaville", "Congo Brazzaville", "Republic of the Congo"],
+            "Ivory Coast": ["Cote d'Ivoire", "Cote d Ivoire", "Cote dIvoire", "Côte d'Ivoire"],
+            "North Korea": ["DPRK", "Democratic People's Republic of Korea", "NK"],
+            "South Korea": ["Korea", "Republic of Korea", "ROK", "SK", "S Korea"],
+            "Czech Republic": ["Czechia"],
+            "East Timor": ["Timor-Leste", "Timor Leste", "Timor"],
+            "Myanmar": ["Burma"],
+            "Cabo Verde": ["Cape Verde"],
+            "Eswatini": ["Swaziland"],
+            "North Macedonia": ["Macedonia", "FYROM"],
+            "Norway": ["Svalbard"],
+            "United Arab Emirates": ["UAE", "Emirates", "U.A.E"],
+            "Bosnia and Herzegovina": ["Bosnia", "BiH"],
+            "Trinidad and Tobago": ["Trinidad", "T&T"],
+            "Saint Kitts and Nevis": ["St Kitts", "Saint Kitts", "SKN"],
+            "Saint Lucia": ["St Lucia"],
+            "Saint Vincent and the Grenadines": ["St Vincent", "Saint Vincent", "SVG"],
+            "Sao Tome and Principe": ["Sao Tome", "São Tomé"],
+            "Papua New Guinea": ["PNG"],
+            "Netherlands": ["Holland"],
+            "Switzerland": ["Swiss"],
+            "Russia": ["Russian Federation"],
+            "South Africa": ["RSA", "SA"],
+            "New Zealand": ["NZ", "Kiwi"],
+            "Australia": ["Aus", "Oz"],
+            "Tanzania": ["TZ"],
+            "Central African Republic": ["CAR"],
+            "Dominican Republic": ["DR"],
+        };
+
+        function normalizeCountryName(input) {
+            return input.toLowerCase().trim().replace(/[^a-z\s]/g, "");
+        }
+
+        function findCountryMatch(input) {
+            const normalized = normalizeCountryName(input);
+
+            // Direct match
+            for (const country of COUNTRY_DATA) {
+                if (normalizeCountryName(country.name) === normalized) {
+                    return country.name;
+                }
+            }
+
+            // Alias match
+            for (const [country, aliases] of Object.entries(COUNTRY_ALIASES)) {
+                for (const alias of aliases) {
+                    if (normalizeCountryName(alias) === normalized) {
+                        return country;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        // Load the SVG map
+        async function loadMap() {
+            try {
+                const response = await fetch('World Vector Map.svg');
+                const svgText = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(svgText, 'image/svg+xml');
+                svgDoc = doc.querySelector('svg');
+
+                // Make it responsive
+                const viewBox = svgDoc.getAttribute('viewBox') ||
+                              `0 0 ${svgDoc.getAttribute('width')} ${svgDoc.getAttribute('height')}`;
+                svgDoc.setAttribute('viewBox', viewBox);
+                svgDoc.removeAttribute('width');
+                svgDoc.removeAttribute('height');
+
+                // Set default colors
+                const paths = svgDoc.querySelectorAll('path[id]');
+                paths.forEach(path => {
+                    path.classList.add('default-color');
+                });
+
+                document.getElementById('map-wrapper').innerHTML = '';
+                document.getElementById('map-wrapper').appendChild(svgDoc);
+
+                // Add tooltips to all paths
+                const tooltip = document.getElementById('country-tooltip');
+                const allPaths = document.querySelectorAll('#map-wrapper path[id]');
+
+                allPaths.forEach(path => {
+                    // Add tooltip on hover
+                    path.addEventListener('mouseenter', (e) => {
+                        const isoCode = path.getAttribute('id');
+                        const country = COUNTRY_DATA.find(c => c.iso === isoCode);
+                        if (country) {
+                            tooltip.textContent = country.name;
+                            tooltip.style.display = 'block';
+                        }
+                    });
+
+                    path.addEventListener('mousemove', (e) => {
+                        tooltip.style.left = (e.pageX + 10) + 'px';
+                        tooltip.style.top = (e.pageY + 10) + 'px';
+                    });
+
+                    path.addEventListener('mouseleave', () => {
+                        tooltip.style.display = 'none';
+                    });
+                });
+
+                // Initialize the country list
+                initializeCountryList();
+            } catch (error) {
+                console.error('Error loading map:', error);
+                document.getElementById('map-wrapper').innerHTML =
+                    '<p style="text-align: center; padding: 40px; color: red;">Error loading map. Make sure the SVG file is in the public folder.</p>';
+            }
+        }
+
+        function checkCountryInSVG(iso) {
+            if (!svgDoc) return false;
+            const path = svgDoc.querySelector(`path[id="${iso}"]`);
+            return !!path;
+        }
+
+        function highlightCountry(iso) {
+            if (!svgDoc) return;
+
+            // Remove previous highlights
+            currentHighlights.forEach(element => {
+                element.classList.remove('highlight');
+            });
+            currentHighlights = [];
+
+            // Special cases: territories that should highlight multiple regions
+            const isoCodes = [iso];
+            if (iso === 'NO') {
+                isoCodes.push('SJ'); // Svalbard
+            }
+            if (iso === 'PS') {
+                isoCodes.push('IL'); // Israel territory
+            }
+
+            // Add new highlights
+            isoCodes.forEach(code => {
+                const paths = svgDoc.querySelectorAll(`path[id="${code}"]`);
+                paths.forEach(path => {
+                    path.classList.add('highlight');
+                    currentHighlights.push(path);
+                });
+            });
+        }
+
+        function clearHighlight() {
+            currentHighlights.forEach(element => {
+                element.classList.remove('highlight');
+            });
+            currentHighlights = [];
+        }
+
+        function initializeCountryList() {
+            // Group by continent
+            const continents = {};
+            COUNTRY_DATA.forEach(country => {
+                if (!continents[country.continent]) {
+                    continents[country.continent] = [];
+                }
+                continents[country.continent].push(country);
+            });
+
+            // Calculate stats
+            let totalMapped = 0;
+            let totalUnmapped = 0;
+
+            COUNTRY_DATA.forEach(country => {
+                if (checkCountryInSVG(country.iso)) {
+                    totalMapped++;
+                } else {
+                    totalUnmapped++;
+                }
+            });
+
+            // Update stats
+            document.getElementById('total-countries').textContent = COUNTRY_DATA.length;
+            document.getElementById('mapped-countries').textContent = totalMapped;
+            document.getElementById('unmapped-countries').textContent = totalUnmapped;
+
+            // Render continent sections
+            const container = document.getElementById('continents-container');
+            const continentOrder = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
+
+            continentOrder.forEach(continent => {
+                if (!continents[continent]) return;
+
+                const section = document.createElement('div');
+                section.className = 'continent-section';
+
+                const countries = continents[continent];
+                const mappedCount = countries.filter(c => checkCountryInSVG(c.iso)).length;
+
+                section.innerHTML = `
+                    <div class="continent-title">
+                        <span>${continent}</span>
+                        <span class="continent-count">${mappedCount}/${countries.length} mapped</span>
+                    </div>
+                    <div class="country-list"></div>
+                `;
+
+                const list = section.querySelector('.country-list');
+
+                countries.forEach(country => {
+                    const isMapped = checkCountryInSVG(country.iso);
+                    const item = document.createElement('div');
+                    item.className = `country-item ${isMapped ? 'mapped' : 'unmapped'}`;
+                    item.innerHTML = `
+                        <span class="iso-code">${country.iso}</span>
+                        <span class="country-name">${country.name}</span>
+                        <span class="status-icon">${isMapped ? '✓' : '✗'}</span>
+                    `;
+
+                    item.addEventListener('mouseenter', () => {
+                        if (isMapped) {
+                            highlightCountry(country.iso);
+                        }
+                    });
+
+                    item.addEventListener('mouseleave', () => {
+                        clearHighlight();
+                    });
+
+                    list.appendChild(item);
+                });
+
+                container.appendChild(section);
+            });
+        }
+
+        // Alias testing functionality
+        const aliasInput = document.getElementById('alias-test-input');
+        const aliasResult = document.getElementById('alias-result');
+
+        aliasInput.addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+
+            if (!value) {
+                aliasResult.innerHTML = '<span style="color: #666;">Type a country name or alias to test...</span>';
+                clearHighlight();
+                return;
+            }
+
+            const match = findCountryMatch(value);
+
+            if (match) {
+                const country = COUNTRY_DATA.find(c => c.name === match);
+                aliasResult.innerHTML = `
+                    <span style="color: #22c55e; font-weight: bold;">✓ Match found!</span>
+                    <span style="margin-left: 10px;">"${value}" → <strong>${match}</strong></span>
+                    ${country ? `<span style="margin-left: 10px; color: #666;">(${country.iso})</span>` : ''}
+                `;
+
+                // Highlight the country on the map
+                if (country) {
+                    highlightCountry(country.iso);
+                }
+            } else {
+                aliasResult.innerHTML = `
+                    <span style="color: #ef4444; font-weight: bold;">✗ No match</span>
+                    <span style="margin-left: 10px;">"${value}" doesn't match any country or alias</span>
+                `;
+                clearHighlight();
+            }
+        });
+
+        // Load the map when page loads
+        loadMap();
+    </script>
+</body>
+</html>

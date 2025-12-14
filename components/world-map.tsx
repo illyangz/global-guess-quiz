@@ -86,18 +86,29 @@ export function WorldMap({ guessedCountries, isFinished = false, allCountries = 
         return
       }
 
-      // The SVG uses ISO alpha-2 codes as IDs for all countries
-      const elements = containerRef.current?.querySelectorAll(`path[id="${isoCode}"]`)
-
-      if (elements && elements.length > 0) {
-        elements.forEach((element) => {
-          element.setAttribute("fill", "#22c55e") // green-500
-          element.setAttribute("stroke", "#166534") // green-800
-          element.setAttribute("stroke-width", "0.5")
-        })
-      } else {
-        console.log("[v0] Could not find SVG element for:", countryName, "with ISO:", isoCode)
+      // Special cases: territories that should color multiple regions
+      const isoCodes = [isoCode]
+      if (countryName === "Norway") {
+        isoCodes.push("SJ") // Svalbard ISO code
       }
+      if (countryName === "Palestine") {
+        isoCodes.push("IL") // Israel territory
+      }
+
+      // The SVG uses ISO alpha-2 codes as IDs for all countries
+      isoCodes.forEach((code) => {
+        const elements = containerRef.current?.querySelectorAll(`path[id="${code}"]`)
+
+        if (elements && elements.length > 0) {
+          elements.forEach((element) => {
+            element.setAttribute("fill", "#22c55e") // green-500
+            element.setAttribute("stroke", "#166534") // green-800
+            element.setAttribute("stroke-width", "0.5")
+          })
+        } else {
+          console.log("[v0] Could not find SVG element for:", countryName, "with ISO:", code)
+        }
+      })
     })
 
     if (isFinished) {
