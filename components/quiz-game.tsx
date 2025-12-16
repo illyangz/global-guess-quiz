@@ -10,13 +10,15 @@ import { WorldMap } from "@/components/world-map";
 import { ContinentTables } from "@/components/continent-tables";
 
 export type Difficulty = "beginner" | "average" | "expert";
+export type Language = "en" | "es" | "fr" | "de" | "pt" | "ar" | "ca" | "it";
 
 interface QuizGameProps {
   onFinish: (
     score: number,
     timeRemaining: number,
     playerName: string,
-    difficulty: Difficulty
+    difficulty: Difficulty,
+    guessedCountries: Set<string>
   ) => void;
 }
 
@@ -30,12 +32,15 @@ export function QuizGame({ onFinish }: QuizGameProps) {
   const [started, setStarted] = useState(false);
   const [playerName, setPlayerName] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("average");
+  const [language, setLanguage] = useState<Language>("en");
   const [input, setInput] = useState("");
   const [guessedCountries, setGuessedCountries] = useState<Set<string>>(
     new Set()
   );
   const [timeLeft, setTimeLeft] = useState(900); // Will be set based on difficulty
   const [isFinished, setIsFinished] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [reviewTimeLeft, setReviewTimeLeft] = useState(180); // 3 minutes for review
   const [feedback, setFeedback] = useState<{
     message: string;
     type: "success" | "error";
@@ -43,7 +48,7 @@ export function QuizGame({ onFinish }: QuizGameProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (started && timeLeft > 0 && !isFinished) {
+    if (started && timeLeft > 0 && !isFinished && !isReviewing) {
       const timer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -55,10 +60,26 @@ export function QuizGame({ onFinish }: QuizGameProps) {
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [started, timeLeft, isFinished]);
+  }, [started, timeLeft, isFinished, isReviewing]);
+
+  // Review period timer
+  useEffect(() => {
+    if (isReviewing && reviewTimeLeft > 0) {
+      const timer = setInterval(() => {
+        setReviewTimeLeft((prev) => {
+          if (prev <= 1) {
+            handleShowResults();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [isReviewing, reviewTimeLeft]);
 
   useEffect(() => {
-    if (!input.trim() || isFinished) return;
+    if (!input.trim() || isFinished || isReviewing) return;
 
     const match = findCountryMatch(input);
 
@@ -69,7 +90,7 @@ export function QuizGame({ onFinish }: QuizGameProps) {
       setFeedback({ message: `✓ ${match}`, type: "success" });
       setTimeout(() => setFeedback(null), 1500);
     }
-  }, [input, guessedCountries, isFinished]);
+  }, [input, guessedCountries, isFinished, isReviewing]);
 
   const handleStart = () => {
     if (playerName.trim()) {
@@ -79,9 +100,15 @@ export function QuizGame({ onFinish }: QuizGameProps) {
     }
   };
 
-  const handleFinish = async () => {
+  const handleFinish = () => {
     if (isFinished) return;
     setIsFinished(true);
+    setIsReviewing(true);
+    setReviewTimeLeft(180); // Reset to 3 minutes
+  };
+
+  const handleShowResults = async () => {
+    if (!isFinished) return;
 
     const score = guessedCountries.size;
 
@@ -114,7 +141,7 @@ export function QuizGame({ onFinish }: QuizGameProps) {
       // Don't let database errors prevent the game from finishing
     }
 
-    onFinish(score, timeLeft, playerName, difficulty);
+    onFinish(score, timeLeft, playerName, difficulty, guessedCountries);
   };
 
   const formatTime = (seconds: number) => {
@@ -191,6 +218,81 @@ export function QuizGame({ onFinish }: QuizGameProps) {
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <label className="font-mono text-sm font-medium">
+                  Select Language:
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  <Button
+                    type="button"
+                    variant={language === "en" ? "default" : "outline"}
+                    onClick={() => setLanguage("en")}
+                    className="font-mono text-xs"
+                  >
+                    English
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={language === "es" ? "default" : "outline"}
+                    onClick={() => setLanguage("es")}
+                    className="font-mono text-xs"
+                  >
+                    Español
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={language === "fr" ? "default" : "outline"}
+                    onClick={() => setLanguage("fr")}
+                    className="font-mono text-xs"
+                  >
+                    Français
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={language === "de" ? "default" : "outline"}
+                    onClick={() => setLanguage("de")}
+                    className="font-mono text-xs"
+                  >
+                    Deutsch
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={language === "it" ? "default" : "outline"}
+                    onClick={() => setLanguage("it")}
+                    className="font-mono text-xs"
+                  >
+                    Italiano
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={language === "pt" ? "default" : "outline"}
+                    onClick={() => setLanguage("pt")}
+                    className="font-mono text-xs"
+                  >
+                    Português
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={language === "ar" ? "default" : "outline"}
+                    onClick={() => setLanguage("ar")}
+                    className="font-mono text-xs"
+                  >
+                    العربية
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={language === "ca" ? "default" : "outline"}
+                    onClick={() => setLanguage("ca")}
+                    className="font-mono text-xs"
+                  >
+                    Català
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground text-center">
+                  Type country names in your selected language
+                </p>
+              </div>
+
               <Button
                 onClick={handleStart}
                 disabled={!playerName.trim()}
@@ -205,12 +307,75 @@ export function QuizGame({ onFinish }: QuizGameProps) {
     );
   }
 
+  // Review screen after quiz ends
+  if (isReviewing) {
+    return (
+      <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6">
+        {/* Review Header */}
+        <Card className="p-4 sm:p-6 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <h2 className="font-mono text-lg sm:text-xl font-bold mb-1">Review Period</h2>
+              <p className="font-mono text-xs sm:text-sm text-muted-foreground">
+                Study the map to see which countries you missed (red) and got correct (green)
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-blue-500" />
+                <div className="font-mono text-2xl font-bold">
+                  {formatTime(reviewTimeLeft)}
+                </div>
+              </div>
+              <Button
+                onClick={handleShowResults}
+                className="font-mono"
+              >
+                View Results
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Stats Summary */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <Card className="bg-green-50 dark:bg-green-950/20 p-4 text-center border-green-200 dark:border-green-900">
+            <div className="font-mono text-3xl font-bold text-green-600">
+              {guessedCountries.size}
+            </div>
+            <div className="font-mono text-xs text-muted-foreground">Correct</div>
+          </Card>
+          <Card className="bg-red-50 dark:bg-red-950/20 p-4 text-center border-red-200 dark:border-red-900">
+            <div className="font-mono text-3xl font-bold text-red-600">
+              {COUNTRIES.length - guessedCountries.size}
+            </div>
+            <div className="font-mono text-xs text-muted-foreground">Missed</div>
+          </Card>
+        </div>
+
+        <WorldMap
+          guessedCountries={guessedCountries}
+          isFinished={isFinished}
+          allCountries={COUNTRIES}
+        />
+
+        <div className="space-y-3">
+          <h3 className="font-mono text-sm font-medium">All Countries by Continent:</h3>
+          <ContinentTables
+            guessedCountries={guessedCountries}
+            isFinished={isFinished}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-7xl space-y-4 sm:space-y-6">
       {/* Stats Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
         <Card className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3">
-          <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 flex-shrink-0" />
+          <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 shrink-0" />
           <div className="font-mono text-sm">
             <span className="text-xl sm:text-2xl font-bold">
               {guessedCountries.size}
@@ -220,7 +385,7 @@ export function QuizGame({ onFinish }: QuizGameProps) {
         </Card>
 
         <Card className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3">
-          <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
+          <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 shrink-0" />
           <div className="font-mono text-xl sm:text-2xl font-bold">
             {formatTime(timeLeft)}
           </div>

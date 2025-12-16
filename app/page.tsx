@@ -17,10 +17,11 @@ export default function Home() {
     timeRemaining: number
     playerName: string
     difficulty: Difficulty
+    guessedCountries: Set<string>
   } | null>(null)
 
-  const handleFinish = (score: number, timeRemaining: number, playerName: string, difficulty: Difficulty) => {
-    setResults({ score, timeRemaining, playerName, difficulty })
+  const handleFinish = (score: number, timeRemaining: number, playerName: string, difficulty: Difficulty, guessedCountries: Set<string>) => {
+    setResults({ score, timeRemaining, playerName, difficulty, guessedCountries })
     setView("results")
   }
 
@@ -72,6 +73,7 @@ export default function Home() {
             timeRemaining={results.timeRemaining}
             playerName={results.playerName}
             difficulty={results.difficulty}
+            guessedCountries={results.guessedCountries}
             onRestart={handleRestart}
             onViewLeaderboard={handleViewLeaderboard}
           />
